@@ -73,5 +73,13 @@ public class TokenPair {
 		return n;
 	}
 	
+	public BigInteger getE() {
+		return e;
+	}
+	
+	public BigInteger getD() {
+		return d;
+	}
+	
 	
 }
