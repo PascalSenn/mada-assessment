@@ -241,7 +241,7 @@ public class Ui extends VBox {
 			
 			   PrintWriter encryptMsg;
 			try {
-				encryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("encryptedMsg.txt")));
+				encryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("cipher.txt")));
 				while(msg.hasNextLine()) { 
 						String message = new String(msg.nextLine());
 						for (int i = 0; i < message.length(); i++){
@@ -282,7 +282,7 @@ public class Ui extends VBox {
 			
 			   PrintWriter decryptMsg;
 			try {
-				decryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("decryptedMsg.txt")));
+				decryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("text-d.txt")));
 				   while(msg2.hasNextLine()) 
 				   {          
 					   String line = msg2.nextLine();
