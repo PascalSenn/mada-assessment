@@ -7,8 +7,8 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import ch.fhnw.mada.rsa.eea.ExtendedEuclideanAlgorithm;
 import ch.fhnw.mada.rsa.fea.FastExponentiationAlgorithm;
-import ch.fhnw.madam.rsa.eea.ExtendedEuclideanAlgorithm;
 
 public class FastExponentiationAlgorithmTests {
 	

@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigInteger;
 
 import org.junit.Test;
-import ch.fhnw.madam.rsa.eea.ExtendedEuclideanAlgorithm;
+
+import ch.fhnw.mada.rsa.eea.ExtendedEuclideanAlgorithm;
  
 
 public class ExtendedEuclideanAlgorithmTests { 

@@ -1,4 +1,4 @@
-package ch.fhnw.madam.rsa.eea;
+package ch.fhnw.mada.rsa.eea;
 
 import java.math.BigInteger;
 

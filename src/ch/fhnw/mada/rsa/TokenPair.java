@@ -3,8 +3,8 @@ package ch.fhnw.mada.rsa;
 import java.math.BigInteger;
 import java.util.Random;
 
+import ch.fhnw.mada.rsa.eea.ExtendedEuclideanAlgorithm;
 import ch.fhnw.mada.rsa.utils.Tuple;
-import ch.fhnw.madam.rsa.eea.ExtendedEuclideanAlgorithm;
 
 public class TokenPair {
 	private BigInteger p;
