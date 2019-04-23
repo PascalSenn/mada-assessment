@@ -2,7 +2,7 @@ package ch.fhnw.mada.rsa.fea;
 
 import java.math.BigInteger;
 
-public class FastExponentiationAlgorithm {
+public class FastExponentiationAlgorithm { 
 	public static FastExponentiationAlgorithm calculate(BigInteger base, BigInteger exponent, BigInteger mod) {
 		return  new FastExponentiationAlgorithm(base ,exponent ,mod );
 	}

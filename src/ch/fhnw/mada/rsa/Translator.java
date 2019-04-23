@@ -12,14 +12,25 @@ public class Translator {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 	}
-	
+	/***
+	 * Enrypts a message
+	 * @param message
+	 * @return
+	 * @throws RSAOutOfRangeException
+	 */
 	public BigInteger encryptMessage(BigInteger message) throws RSAOutOfRangeException {
 		if(message.compareTo(publicKey.v1) >= 0) {
 			throw new RSAOutOfRangeException();
 		}
 		return FastExponentiationAlgorithm.calculate(message, publicKey.v2, publicKey.v1).getResult();
 	}
-	
+
+	/***
+	 * Decrypts a message
+	 * @param message
+	 * @return
+	 * @throws RSAOutOfRangeException
+	 */
 	public BigInteger decryptMessage(BigInteger message) throws RSAOutOfRangeException {
 		if(message.compareTo(privateKey.v1) >= 0) {
 			throw new RSAOutOfRangeException();
