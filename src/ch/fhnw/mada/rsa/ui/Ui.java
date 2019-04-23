@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
+import ch.fhnw.mada.rsa.RSAOutOfRangeException;
 import ch.fhnw.mada.rsa.TokenPair;
 import ch.fhnw.mada.rsa.Translator;
 import ch.fhnw.mada.rsa.utils.Tuple;
@@ -25,9 +26,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage; 
 
 public class Ui extends VBox {
-	private Integer rsaN;
-	private Integer rsaD;
-	private Integer rsaE;
 	
 	private TokenPair tokenPair;
 	private Text title;
@@ -39,11 +37,11 @@ public class Ui extends VBox {
 	private Stage stage;
     private FileChooser fileChooser;
     private GridPane generate;
-    private String message;
     private Scanner msg;
 
 	private GridPane publicKeyPane;
 	private GridPane privateKeyPane;
+	private GridPane enanddecryption;
     private FileChooser publicKeyReadIn;
     private FileChooser privateKeyReadIn;
 	private Button selectorPublicKey;
@@ -51,6 +49,14 @@ public class Ui extends VBox {
 	private Button generateKeyPair;
     private Scanner sPub;
     private Scanner sPri;
+    
+
+	private GridPane folderChooser2;
+    private FileChooser fileChooser2;
+	private Button selector2;
+    private Scanner msg2;
+	private TextField path2;
+
     
     private Button encrypt;
     private Button decrypt;
@@ -68,18 +74,16 @@ public class Ui extends VBox {
 		//Choose the TextFile
 		fileChooser = new FileChooser();
 		folderChooser = new GridPane();
-		selector = new Button("Select File");
+		selector = new Button("Select File to Encrypt");
 		selector.setOnAction(x -> {
 			try {
         		//File erstellen
         		File f = new File("");
         		f = fileChooser.showOpenDialog(stage);
+        		
         		//File lesen
         		msg = new Scanner(f);
-        		//message lesen
-    			message = new String(sPub.next());
-    			
-    			//Pfad binden
+    			//Pfad binden*/
     			pm.path.set(f.getPath());       			
             	
 			} catch (FileNotFoundException e1) {
@@ -91,6 +95,32 @@ public class Ui extends VBox {
 		//Show Textfile Path
 		path = new TextField();
 		path.textProperty().bind(pm.path);
+		
+
+		//Choose the TextFile
+		fileChooser2 = new FileChooser();
+		folderChooser2 = new GridPane();
+		selector2 = new Button("Select File to Decrypt");
+		selector2.setOnAction(x -> {
+			try {
+        		//File erstellen
+        		File f = new File("");
+        		f = fileChooser.showOpenDialog(stage);
+        		
+        		//File lesen
+        		msg2 = new Scanner(f);
+    			//Pfad binden*/
+    			pm.path2.set(f.getPath());       			
+            	
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}	
+		});
+		
+		//Show Textfile Path
+		path2 = new TextField();
+		path2.textProperty().bind(pm.path2);
 		
 
 		//Liest den Public Key aus einer Datei und füllt N und E ab
@@ -111,6 +141,8 @@ public class Ui extends VBox {
     			//N, E und en PrivateKey Pfad binden
     			pm.rsaN.set(keyparts[0]);
     			pm.rsaE.set(keyparts[1]);
+    			System.out.println(pm.rsaN.get());
+    			System.out.println(pm.rsaE.get());
     			pm.pathPub.set(f.getPath());       			
             	
 			} catch (FileNotFoundException e1) {
@@ -138,6 +170,8 @@ public class Ui extends VBox {
 	        			pm.rsaN.set(keyparts[0]);
 	        			pm.rsaD.set(keyparts[1]);
 	        			pm.pathPri.set(f.getPath());
+	        			System.out.println(pm.rsaN.get());
+	        			System.out.println(pm.rsaD.get());
 	                	
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
@@ -171,6 +205,10 @@ public class Ui extends VBox {
 	        	skWriter.println("(" + tokenPair.privateKey().v1 + "," + tokenPair.privateKey().v2 + ")");
 	        	pkWriter = new PrintWriter(new BufferedWriter(new FileWriter("pk.txt"))); 
 	        	pkWriter.println("(" + tokenPair.publicKey().v1 + "," + tokenPair.publicKey().v2 + ")"); 
+    			System.out.println("N:" + pm.rsaN.get());
+    			System.out.println("D:" + pm.rsaD.get());
+    			System.out.println("E:" + pm.rsaE.get());
+	        	
 	        } catch (IOException ioe) { 
 	            ioe.printStackTrace(); 
 	        } finally { 
@@ -186,48 +224,103 @@ public class Ui extends VBox {
 			
 		});
 		
+		enanddecryption = new GridPane();
 		encrypt = new Button("Encrypt");
 		encrypt.setOnAction(x -> {
-			
-			var translator = new Translator( 
-					new Tuple<BigInteger>(pm.rsaN, pm.rsaD),
-					new Tuple<BigInteger>(pm.rsaN, pm.rsaE)
-			);
-			
-			   PrintWriter encryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("encryptedMsg.txt"))); 
-			   for (int i = 0; i < message.length(); i++){
-				    char c = message.charAt(i);     
-				    int ascii = (int) c;
-				    encryptMsg.print(translator.encryptMessage(BigInteger.valueOf(ascii)));
-				}
-			
-			
-		});
-		
-		encrypt = new Button("Decrypt");
-		encrypt.setOnAction(x -> {
+			String str= pm.rsaN.get();
+			BigInteger n = new BigInteger(str);
+			str= pm.rsaD.get();
+			BigInteger d = new BigInteger(str);
+			str = pm.rsaE.get();
+			BigInteger e = new BigInteger(str);
 
 			var translator = new Translator( 
-					new Tuple<BigInteger>(pm.rsaN, pm.rsaD),
-					new Tuple<BigInteger>(pm.rsaN, pm.rsaE)
+					new Tuple<BigInteger>(n, d),
+					new Tuple<BigInteger>(n, e)
 			);
 			
-			   PrintWriter decryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("decryptedMsg.txt"))); 
-			   for (int i = 0; i < message.length(); i++){
-				    char c = message.charAt(i);     
-				    int ascii = (int) c;
-				    decryptMsg.print(translator.decryptMessage(BigInteger.valueOf(ascii)));
-				}
+			   PrintWriter encryptMsg;
+			try {
+				encryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("encryptedMsg.txt")));
+				while(msg.hasNextLine()) { 
+						String message = new String(msg.nextLine());
+						for (int i = 0; i < message.length(); i++){
+							char c = message.charAt(i);
+							int ascii = (int) c;
+						    encryptMsg.println(translator.encryptMessage(BigInteger.valueOf(ascii)));
+						}
+						encryptMsg.println("");
+						
+				   }
+			    encryptMsg.flush();  
+			    encryptMsg.close();  
+				   
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (RSAOutOfRangeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
+			
 			
 		});
 		
-		
+		decrypt = new Button("Decrypt");
+		decrypt.setOnAction(x -> {
+			String str= pm.rsaN.get();
+			BigInteger n = new BigInteger(str);
+			str= pm.rsaD.get();
+			BigInteger d = new BigInteger(str);
+			str = pm.rsaE.get();
+			BigInteger e = new BigInteger(str);
+
+			var translator = new Translator( 
+					new Tuple<BigInteger>(n, d),
+					new Tuple<BigInteger>(n, e)
+			);
+			
+			   PrintWriter decryptMsg;
+			try {
+				decryptMsg = new PrintWriter(new BufferedWriter(new FileWriter("decryptedMsg.txt")));
+				   while(msg2.hasNextLine()) 
+				   {          
+					   String line = msg2.nextLine();
+						if(line.length() == 0) {
+							System.out.println("");
+						    decryptMsg.println("");
+						}else {
+							BigInteger encryptAscii = new BigInteger(line);
+							var decryptedAscii  = translator.decryptMessage(encryptAscii);
+							int ascii = decryptedAscii.intValue();
+							char c = (char) ascii;
+							
+
+						    decryptMsg.print(c);
+							System.out.print(c);
+						}
+					
+				   }
+				    decryptMsg.flush();  
+				    decryptMsg.close(); 
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (RSAOutOfRangeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
+		});
 	}
 	
 	private void layoutControls() {
 		folderChooser.setMaxWidth(USE_PREF_SIZE);
 		folderChooser.add(path, 0, 0);
 		folderChooser.add(selector, 1, 0);
+		
+		folderChooser2.setMaxWidth(USE_PREF_SIZE);
+		folderChooser2.add(path2, 0, 0);
+		folderChooser2.add(selector2, 1, 0);
 		
 
 		publicKeyPane.setMaxWidth(USE_PREF_SIZE);
@@ -240,15 +333,12 @@ public class Ui extends VBox {
 		
 		generate.setMaxWidth(USE_PREF_SIZE);
 		generate.add(generateKeyPair, 0, 0);
-		
-		/*showN.getChildren().addAll(n, LabelN);
-		showD.getChildren().addAll(d, LabelD);
-		showE.getChildren().addAll(e, LabelE);*/
-		
-		/*showrsaKeys.getChildren().addAll(showN, showD, showE);*/
+		enanddecryption.setMaxWidth(USE_PREF_SIZE);
+		enanddecryption.add(encrypt, 0, 0);
+		enanddecryption.add(decrypt, 1, 0);
 		
 		titleLayout.getChildren().add(title);
-		getChildren().addAll(titleLayout, folderChooser, publicKeyPane, privateKeyPane, generate);
+		getChildren().addAll(titleLayout, folderChooser, folderChooser2, publicKeyPane, privateKeyPane, generate, enanddecryption);
 		
 		
 	}
