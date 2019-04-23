@@ -42,7 +42,25 @@ public class PresentationModel {
 	public final DoubleProperty processingProgressProperty = new SimpleDoubleProperty(0); 
 	private final ObservableList<String> logList = FXCollections.observableArrayList();
 	public final ListProperty<String> logProperty = new SimpleListProperty<String>(logList); 
+
+	public String getSecretKeyPath() {
+		return workingDirectoryProperty.get() + "\\" + SECRECT_KEY;
+	}
+
+	public String getPublicKeyPath() {
+		return workingDirectoryProperty.get() + "\\" + PUBLIC_KEY;
+	}
+	public String getCipherPath() {
+		return workingDirectoryProperty.get() + "\\" + CIPHER_FILE;
+	}
+
+	public String getTextPath() {
+		return workingDirectoryProperty.get() + "\\" + TEXT_FILE;
+	}
 	
+	public String getTextDPath() {
+		return workingDirectoryProperty.get() + "\\" + TEXT_D_FILE;
+	}
 	
 	public void resetDirectory() {
 		workingDirectoryProperty.set(DEFAULT_FOLDER);
@@ -67,72 +85,10 @@ public class PresentationModel {
         	pkWriter.flush(); 
         	
         } catch (IOException ioe) { 
+			log("ERROR - Could not write output files ", 0);
             ioe.printStackTrace(); 
         }
 		log("Key generation finished", 100); 
-	}
- 
-	private void log(String message, double progress) { 
-		Platform.runLater(() -> {
-			if(!processingProperty.get()) {
-			}
-			processingProperty.set(true);
-		
-			logList.add( String.format("[%s] %s",LocalDateTime.now().format(LOG_DATE_FORMAT), message));
-			processingProgressProperty.setValue(progress); 
-		});
-		 
-	}
-	public String getSecretKeyPath() {
-		return workingDirectoryProperty.get() + "\\" + SECRECT_KEY;
-	}
-
-	public String getPublicKeyPath() {
-		return workingDirectoryProperty.get() + "\\" + PUBLIC_KEY;
-	}
-	public String getCipherPath() {
-		return workingDirectoryProperty.get() + "\\" + CIPHER_FILE;
-	}
-
-	public String getTextPath() {
-		return workingDirectoryProperty.get() + "\\" + TEXT_FILE;
-	}
-	
-	public String getTextDPath() {
-		return workingDirectoryProperty.get() + "\\" + TEXT_D_FILE;
-	}
- 
-
-	private Tuple<BigInteger> getPublicKey() throws FileNotFoundException {
-		return getKeyPair(getPublicKeyPath());
-	}
-	private Tuple<BigInteger> getPrivateKey() throws FileNotFoundException{
-		return getKeyPair(getSecretKeyPath());
-	}
-
-	private Tuple<BigInteger> getKeyPair(String path) throws FileNotFoundException {
-		File file = new File(path);
-		try(Scanner sc = new Scanner(file);) { 
-		    sc.useDelimiter(","); 
-		    var first = new BigInteger(sc.next().replaceAll("\\(", ""));
-		    var second = new BigInteger(sc.next().replaceAll("\\)", ""));
-		    return new Tuple<BigInteger>(first, second); 
-		}
-		catch(FileNotFoundException ex) {
-			log("ERROR - File "+path+" was not found", 0);
-			throw ex;
-		}
-		catch(Exception ex) {
-			log("ERROR - Error while processing "+path, 0);
-			throw ex;
-		}
-	}
-	
-	private Translator getTranslator() throws FileNotFoundException {
-		return new Translator(
-				getPrivateKey(),
-				getPublicKey()
-		); 
 	}
 
 	/***
@@ -199,4 +155,49 @@ public class PresentationModel {
 		log("Decryption finished", 100);
 		
 	}
+ 
+
+	private void log(String message, double progress) { 
+		Platform.runLater(() -> {
+			if(!processingProperty.get()) {
+				processingProperty.set(true);
+			}
+		
+			logList.add( String.format("[%s] %s",LocalDateTime.now().format(LOG_DATE_FORMAT), message));
+			processingProgressProperty.setValue(progress); 
+		});
+		 
+	}
+	private Tuple<BigInteger> getPublicKey() throws FileNotFoundException {
+		return getKeyPair(getPublicKeyPath());
+	}
+	private Tuple<BigInteger> getPrivateKey() throws FileNotFoundException{
+		return getKeyPair(getSecretKeyPath());
+	}
+
+	private Tuple<BigInteger> getKeyPair(String path) throws FileNotFoundException {
+		File file = new File(path);
+		try(Scanner sc = new Scanner(file);) { 
+		    sc.useDelimiter(","); 
+		    var first = new BigInteger(sc.next().replaceAll("\\(", ""));
+		    var second = new BigInteger(sc.next().replaceAll("\\)", ""));
+		    return new Tuple<BigInteger>(first, second); 
+		}
+		catch(FileNotFoundException ex) {
+			log("ERROR - File "+path+" was not found", 0);
+			throw ex;
+		}
+		catch(Exception ex) {
+			log("ERROR - Error while processing "+path, 0);
+			throw ex;
+		}
+	}
+	
+	private Translator getTranslator() throws FileNotFoundException {
+		return new Translator(
+				getPrivateKey(),
+				getPublicKey()
+		); 
+	}
+
 }
