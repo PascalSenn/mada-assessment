@@ -8,7 +8,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigInteger; 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -28,6 +31,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList; 
+
 public class PresentationModel {
 	public final static String DEFAULT_FOLDER = "C:\\temp";
 	public final static String SECRECT_KEY = "sk.txt";
@@ -175,17 +179,24 @@ public class PresentationModel {
 		return getKeyPair(getSecretKeyPath());
 	}
 
-	private Tuple<BigInteger> getKeyPair(String path) throws FileNotFoundException {
-		File file = new File(path);
-		try(Scanner sc = new Scanner(file);) { 
-		    sc.useDelimiter(","); 
-		    var first = new BigInteger(sc.next().replaceAll("\\(", ""));
-		    var second = new BigInteger(sc.next().replaceAll("\\)", ""));
+	private Tuple<BigInteger> getKeyPair(String path) throws FileNotFoundException { 
+		
+		try { 
+			var file = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+			file = file.replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("\n", "").replaceAll("\r", "");
+			var parts = file.split(",");
+		    
+		    var first = new BigInteger(parts[0]);
+		    var second = new BigInteger(parts[1]);
 		    return new Tuple<BigInteger>(first, second); 
 		}
 		catch(FileNotFoundException ex) {
 			log("ERROR - File "+path+" was not found", 0);
 			throw ex;
+		}
+		catch(IOException ex) {
+			log("ERROR - File "+path+" was not found", 0);
+			throw new RuntimeException(ex.getMessage());
 		}
 		catch(Exception ex) {
 			log("ERROR - Error while processing "+path, 0);

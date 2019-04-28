@@ -12,6 +12,7 @@ public class Translator {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 	}
+
 	/***
 	 * Enrypts a message
 	 * @param message
