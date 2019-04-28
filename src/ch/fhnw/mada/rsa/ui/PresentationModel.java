@@ -106,7 +106,7 @@ public class PresentationModel {
 			var inputStream = new BufferedReader(new FileReader(inputFile))){
 			var translator = getTranslator();
 			
-			inputStream.lines()
+			var result = inputStream.lines()
 				.flatMap(
 						x -> x.chars()
 							.mapToObj(
@@ -120,7 +120,8 @@ public class PresentationModel {
 										return BigInteger.ZERO;
 									}
 							)
-				).forEach(x -> outputWriter.println(x.toString()));
+				).map(BigInteger::toString).reduce((x,y)-> x + "," + y).orElse("");
+			outputWriter.write(result);
 			outputWriter.flush();
 			   
 		} catch (IOException e1) { 
@@ -137,20 +138,23 @@ public class PresentationModel {
 		log("Decryption started", 0);
 		File inputFile = new File(getCipherPath());
 		try(var outputWriter = new PrintWriter(new BufferedWriter(new FileWriter(getTextDPath())));
-			var inputStream = new BufferedReader(new FileReader(inputFile))){
-			var translator = getTranslator();
 			
-			inputStream.lines()
-				.map(x-> {
-					try {
-						return translator.decryptMessage(new BigInteger(x));
-					} catch (RSAOutOfRangeException e) { 
-						e.printStackTrace();  
-						log("ERROR Output might be corrupted. Input was bigger than public key",0);
-						
-					}
-					return BigInteger.ZERO;
-				}).forEach(x -> outputWriter.write((char)x.intValue()));
+			var inputStream =new BufferedReader(new FileReader(inputFile));
+			var scanner =  new Scanner(inputStream);){
+			var translator = getTranslator();
+			scanner.useDelimiter(",");
+			while(scanner.hasNext()) { 
+				BigInteger nextBigInt;
+				try {
+					nextBigInt =  translator.decryptMessage(new BigInteger(scanner.next()));
+				} catch (RSAOutOfRangeException e) { 
+					e.printStackTrace();  
+					log("ERROR Output might be corrupted. Input was bigger than public key",0);
+					
+				}
+				nextBigInt =  BigInteger.ZERO;
+				outputWriter.write((char)nextBigInt.intValue());
+			}
 			   
 		} catch (IOException e1) { 
 			log("ERROR - Could not write output file or read input file", 0);
